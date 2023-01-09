@@ -1,5 +1,7 @@
 
-notes.txt
+
+package-lock.json
+*.txt
 
 # Logs
 logs
