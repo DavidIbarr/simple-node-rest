@@ -20,5 +20,8 @@
   "homepage": "https://github.com/DavidIbarr/simple-node-rest#readme",
   "devDependencies": {
     "nodemon": "^2.0.20"
+  },
+  "dependencies": {
+    "uuid": "^9.0.0"
   }
 }
