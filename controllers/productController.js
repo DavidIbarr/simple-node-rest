@@ -1,4 +1,5 @@
 const Product = require('../models/productModel')
+const { getPostData } = require('../utils/utils')
 
 // @desc 		Get all products
 // #route 	GET /api/products
@@ -13,8 +14,8 @@ async function getProducts(req, res) {
 	}
 }
 
-// @desc 		Get single product
-// #route 	GET /api/product/id
+// @desc 		Get a single product
+// #route 	GET /api/product/:id
 async function getProduct(req, res, id) {
 	try {
 		const product = await Product.findById(id)
@@ -30,33 +31,76 @@ async function getProduct(req, res, id) {
 	}
 }
 
-// @desc 		Create a products
+// @desc 		Create a product
 // #route 	POST /api/products
 async function createProduct(req, res) {
 	try {
-		// get the body of the post request as json
+		// return body data from the function
+		const body = await getPostData(req)
+		const { title, description, price } = JSON.parse(body)
 
-		let body = ''
-		req.on('data', (chunk) => {
-			// convert the buffer to a string
-			body += chunk.toString()
-		})
-		req.on('end',  async () => {
-			// parse the json string
+		const product = {
+			title,
+			description,
+			price
+		}
+
+		// use the model to create the product, file "database" access is async
+		const newProduct = await Product.create(product)
+		res.writeHead(201, { 'Content-Type': 'application/json' })
+		return res.end(JSON.stringify(newProduct))
+
+	} catch(error) {
+		console.log(error);
+	}
+}
+
+// @desc 		Update a product
+// #route 	PUT /api/products/:id
+async function updateProduct(req, res, id) {
+	try {
+		const product = await Product.findById(id)
+
+		if(!product) {
+			res.writeHead(404, {'Content-Type': 'application/json'})
+			res.end(JSON.stringify({ message: 'Product Not Found' }))
+		} else {
+			// get the updated data for the product in the req body
+			const body = await getPostData(req)
 			const { title, description, price } = JSON.parse(body)
-
-			const product = {
-				title,
-				description,
-				price
+			// either get the body data or existing fields
+			const productData = {
+				title: 							title || product.title,
+				description: 	description || product.description,
+				price: 							price || product.price
 			}
 
-			// use the model to create the product, file "database" access is async
-			const newProduct = await Product.create(product)
-			res.writeHead(201, { 'Content-Type': 'application/json' })
-			return res.end(JSON.stringify(newProduct))
-		})
+			const updatedProduct = await Product.update(id, productData)
 
+			res.writeHead(200, { 'Content-Type': 'application/json' })
+			return res.end(JSON.stringify(updatedProduct))
+		}
+		
+	} catch(error) {
+		console.log(error);
+	}
+}
+
+// @desc 		Delete a product
+// #route 	DELETE /api/product/:id
+async function deleteProduct(req, res, id) {
+	try {
+		const product = await Product.findById(id)
+
+		if(!product) {
+			res.writeHead(404, {'Content-Type': 'application/json'})
+			res.end(JSON.stringify({ message: 'Product Not Found' }))
+		} else {
+			await Product.remove(id)
+
+			res.writeHead(404, {'Content-Type': 'application/json'})
+			res.end(JSON.stringify({ message: `Product ${id} deleted`}))
+		}
 	} catch(error) {
 		console.log(error);
 	}
@@ -65,7 +109,9 @@ async function createProduct(req, res) {
 module.exports = {
 	getProducts,
 	getProduct,
-	createProduct
+	createProduct,
+	updateProduct,
+	deleteProduct
 }
 
 
