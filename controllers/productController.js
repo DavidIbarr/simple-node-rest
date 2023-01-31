@@ -1,7 +1,7 @@
 const Product = require('../models/productModel')
 const { getPostData } = require('../utils/utils')
 
-// @desc 		Get all products
+// @desc 	Get all products
 // #route 	GET /api/products
 async function getProducts(req, res) {
 	try {
@@ -14,7 +14,7 @@ async function getProducts(req, res) {
 	}
 }
 
-// @desc 		Get a single product
+// @desc 	Get a single product
 // #route 	GET /api/product/:id
 async function getProduct(req, res, id) {
 	try {
@@ -31,7 +31,7 @@ async function getProduct(req, res, id) {
 	}
 }
 
-// @desc 		Create a product
+// @desc 	Create a product
 // #route 	POST /api/products
 async function createProduct(req, res) {
 	try {
@@ -45,7 +45,7 @@ async function createProduct(req, res) {
 			price
 		}
 
-		// use the model to create the product, file "database" access is async
+		// use the model to create the product, file "database" access is asynchronous
 		const newProduct = await Product.create(product)
 		res.writeHead(201, { 'Content-Type': 'application/json' })
 		return res.end(JSON.stringify(newProduct))
@@ -55,7 +55,7 @@ async function createProduct(req, res) {
 	}
 }
 
-// @desc 		Update a product
+// @desc 	Update a product
 // #route 	PUT /api/products/:id
 async function updateProduct(req, res, id) {
 	try {
@@ -70,9 +70,9 @@ async function updateProduct(req, res, id) {
 			const { title, description, price } = JSON.parse(body)
 			// either get the body data or existing fields
 			const productData = {
-				title: 							title || product.title,
+				title: 		title || product.title,
 				description: 	description || product.description,
-				price: 							price || product.price
+				price: 		price || product.price
 			}
 
 			const updatedProduct = await Product.update(id, productData)
@@ -86,7 +86,7 @@ async function updateProduct(req, res, id) {
 	}
 }
 
-// @desc 		Delete a product
+// @desc 	Delete a product
 // #route 	DELETE /api/product/:id
 async function deleteProduct(req, res, id) {
 	try {
